@@ -1,0 +1,159 @@
+local M = {}
+-- local utils = require 'user.mason_utils'
+-- -- local lspconfig = require 'lspconfig'
+-- local toMason = require('mason-lspconfig').get_mappings().lspconfig_to_package
+
+local servers = {
+	rust_analyzer = {},
+	jedi_language_server = {},
+	nil_ls = {},
+	-- pylsp = {
+	-- 	settings = {
+	-- 		pylsp = {
+	-- 			plugins = {
+	-- 				pydocstyle = {
+	-- 					enabled = true,
+	-- 					ignore = {
+	-- 						'D101',
+	-- 						'D102',
+	-- 						'D103',
+	-- 						'D105',
+	-- 						'D203',
+	-- 						'D107',
+	-- 						'D100',
+	-- 						'D212',
+	-- 					},
+	-- 				},
+	-- 				mypy = { enabled = true },
+	-- 				pylint = {
+	-- 					enabled = false,
+	-- 					ignore = {
+	-- 						'C0116',
+	-- 						'C0114',
+	-- 					},
+	-- 				},
+	-- 				jedi_completion = { enabled = true },
+	-- 				rope_completion = {
+	-- 					enabled = false,
+	-- 					eager = true,
+	-- 				},
+	-- 				isort = { enabled = true },
+	-- 			},
+	-- 		},
+	-- 	},
+	-- },
+	-- pylyzer = {},
+	ts_ls = {
+		filetype = { 'js', 'ts' },
+	},
+	lua_ls = {
+		settings = {
+			Lua = {
+				hint = { enable = true },
+				diagnostics = { globals = { 'vim' } },
+				runtime = { version = 'LuaJIT' },
+				workspace = {
+					checkThirdParty = false,
+				},
+			},
+		},
+	},
+	gopls = {
+		settings = {
+			gopls = {
+				semanticTokens = true,
+				-- staticcheck = true,
+				analyses = {
+					unusedparams = true,
+				},
+				hints = {
+					assignVariableTypes = true,
+					compositeLiteralFields = true,
+					compositeLiteralTypes = true,
+					constantValues = true,
+					functionTypeParameters = true,
+					parameterNames = true,
+					rangeVariableTypes = true,
+				},
+			},
+		},
+	},
+	-- texlab = { filetypes = { 'plaintex', 'tex', 'rmd', 'quarto' } },
+	clangd = {
+		-- capabilities = vim.tbl_deep_extend('force', capabilities, { offsetEncoding = 'utf-16' }),
+		filetypes = { 'c', 'cpp', 'cuda' },
+	},
+	-- omnisharp = {},
+	asm_lsp = {},
+	r_language_server = {},
+	golangci_lint_ls = {
+		default_config = {
+			cmd = { 'golangci-lint-langserver' },
+			root_markers = { '.git', 'go.mod' },
+			init_options = {
+				command = {
+					'golangci-lint',
+					'run',
+					'--enable-all',
+					'--disable',
+					'lll',
+					'--out-format',
+					'json',
+					'--issues-exit-code=1',
+				},
+			},
+		},
+	},
+}
+
+local border = {
+	{ '╭', 'FloatBorder' },
+	{ '─', 'FloatBorder' },
+	{ '╮', 'FloatBorder' },
+	{ '│', 'FloatBorder' },
+	{ '╯', 'FloatBorder' },
+	{ '─', 'FloatBorder' },
+	{ '╰', 'FloatBorder' },
+	{ '│', 'FloatBorder' },
+}
+
+local hover = vim.lsp.buf.hover
+
+vim.lsp.buf.hover = function()
+	return hover { border = border }
+end
+
+local sig_help = vim.lsp.buf.signature_help
+vim.lsp.buf.signature_help = function()
+	return sig_help { border = border }
+end
+
+local on_attach = function()
+	-- require('lsp_signature').on_attach {
+	-- 	bind = true,
+	-- 	doc_lines = 0,
+	-- 	hint_enable = true,
+	-- 	hint_prefix = ' ', -- TODO: replace with user.icons reference
+	-- 	handler_opts = {
+	-- 		border = 'rounded', -- double, rounded, single, shadow, none, or a table of borders
+	-- 	},
+	-- }
+
+	require('user.mappings').set_lsp_mappings()
+	vim.lsp.inlay_hint.enable()
+	vim.lsp.codelens.enable()
+end
+
+
+-- setup all servers
+for server, extra in pairs(servers) do
+	local settings = {
+		on_attach = on_attach,
+	}
+
+	settings = vim.tbl_deep_extend('force', settings, extra)
+	vim.lsp.config(server, settings)
+	vim.lsp.enable(server)
+end
+
+return M
