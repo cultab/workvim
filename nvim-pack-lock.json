@@ -1,0 +1,8 @@
+{
+  "plugins": {
+    "command.nvim": {
+      "rev": "3403ac61c3d7500251eda1ed6231f8bf5ed2ea5d",
+      "src": "https://github.com/cultab/command.nvim"
+    }
+  }
+}
