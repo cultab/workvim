@@ -2,6 +2,7 @@
 --- | 'wezterm'
 --- | 'tmux'
 --- | 'toggleterm'
+--- | 'vscode'
 --- | 'auto' -- pick automatically by examining environment vars
 
 --- @alias rule table<string, fun(string?):string>
